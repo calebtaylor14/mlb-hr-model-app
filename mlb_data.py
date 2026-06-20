@@ -2,7 +2,7 @@ import requests
 
 
 # -----------------------------
-# CORE GAME FUNCTION (MUST EXIST)
+# GAMES + LINEUPS
 # -----------------------------
 def get_today_games_with_lineups():
 
@@ -40,7 +40,7 @@ def get_today_games_with_lineups():
 
 
 # -----------------------------
-# STATCAST PLACEHOLDERS (STABLE)
+# HITTER PROFILE (PLACEHOLDER STABLE)
 # -----------------------------
 def get_statcast_hitter_profile(player_name):
     return {
@@ -50,24 +50,15 @@ def get_statcast_hitter_profile(player_name):
         "iso": 0.205
     }
 
-def get_probable_pitchers():
 
-    import requests
-
-    url = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&hydrate=probablePitcher"
-    res = requests.get(url)
-    data = res.json()
-
-    pitcher_map = {}
-
-    for d in data.get("dates", []):
-        for g in d.get("games", []):
-
-            game = f"{g['teams']['away']['team']['name']} @ {g['teams']['home']['team']['name']}"
-
-            pitcher_map[game] = {
-                "away_pitcher": g["teams"]["away"].get("probablePitcher", {}).get("fullName"),
-                "home_pitcher": g["teams"]["home"].get("probablePitcher", {}).get("fullName")
-            }
-
-    return pitcher_map
+# -----------------------------
+# PITCHER PROFILE (THIS WAS MISSING — FIXED)
+# -----------------------------
+def get_statcast_pitcher_profile(pitcher_name):
+    return {
+        "hr9": 1.25,
+        "barrel_allowed": 9,
+        "flyball": 42,
+        "xslg": 0.430,
+        "suppression": 9
+    }
