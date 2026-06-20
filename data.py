@@ -39,9 +39,17 @@ def build_slate():
     # -----------------------------
    rosters = get_team_rosters()
 
+rosters = get_team_rosters()
+
 all_hitters = []
 
 for team, players in rosters.items():
+
+    for i, player in enumerate(players[:12]):
+
+        spot = (i % 9) + 1
+
+        all_hitters.append((player, spot, team))
 
     for i, player in enumerate(players[:12]):  # top 12 hitters per team
 
