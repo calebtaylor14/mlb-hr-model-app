@@ -4,34 +4,51 @@ import pandas as pd
 from data import build_slate
 from model import calculate_hr_score
 
+# -----------------------------
+# APP TITLE
+# -----------------------------
 st.title("⚾ MLB HR Model (LIVE)")
 
 # -----------------------------
-# LOAD DATA (THIS DEFINES df)
+# LOAD DATA SAFELY
 # -----------------------------
 df = build_slate()
 
-# -----------------------------
-# SAFETY CHECK (prevents crash)
-# -----------------------------
+# safety guard (prevents crashes)
 if df is None or df.empty:
-    st.error("No data loaded")
+    st.error("No data loaded from build_slate()")
     st.stop()
 
 # -----------------------------
-# MODEL RUN
+# RUN MODEL
 # -----------------------------
 df["HR_Score"] = df.apply(calculate_hr_score, axis=1)
 
 df = df.sort_values("HR_Score", ascending=False)
 
 # -----------------------------
-# OUTPUT
+# DISPLAY TOP TARGETS
 # -----------------------------
 st.subheader("🔥 Top HR Targets")
 
-st.dataframe(df[["player", "game", "batting_order", "HR_Score"]])
+# dynamically handle missing columns safely
+display_cols = ["player", "game", "HR_Score"]
 
-st.subheader("Full Slate")
+if "batting_order" in df.columns:
+    display_cols.insert(2, "batting_order")
+
+st.dataframe(df[display_cols])
+
+# -----------------------------
+# FULL TABLE
+# -----------------------------
+st.subheader("📊 Full Slate")
 
 st.dataframe(df)
+
+# -----------------------------
+# DEBUG SECTION (optional but helpful)
+# -----------------------------
+with st.expander("Debug Data Preview"):
+    st.write("Columns:", list(df.columns))
+    st.dataframe(df.head())
