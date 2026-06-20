@@ -32,7 +32,23 @@ df = df.sort_values("HR_Score", ascending=False)
 st.subheader("🔥 Top HR Targets")
 
 # dynamically handle missing columns safely
-display_cols = ["player", "game", "HR_Score"]
+display_cols = [
+    "player",
+    "team",
+    "batting_order",
+    "barrel_pct",
+    "hardhit_pct",
+    "pull_air_pct",
+    "iso",
+    "pitcher_hr9",
+    "pitcher_barrel_allowed",
+    "pitcher_flyball",
+    "pitcher_xslg",
+    "pitcher_suppression",
+    "park_score",
+    "weather_score",
+    "order_multiplier"
+]
 
 if "batting_order" in df.columns:
     display_cols.insert(2, "batting_order")
