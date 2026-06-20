@@ -37,10 +37,17 @@ def build_slate():
     # -----------------------------
     # STEP 1: COLLECT PLAYERS
     # -----------------------------
-    for g in games:
+   rosters = get_team_rosters()
 
-        away_lineup = g.get("away_lineup", [])
-        home_lineup = g.get("home_lineup", [])
+all_hitters = []
+
+for team, players in rosters.items():
+
+    for i, player in enumerate(players[:12]):  # top 12 hitters per team
+
+        spot = (i % 9) + 1
+
+        all_hitters.append((player, spot, team))
 
         for p in away_lineup:
             name = p.get("name")
