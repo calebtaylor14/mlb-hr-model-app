@@ -37,8 +37,6 @@ def build_slate():
     # -----------------------------
     # STEP 1: COLLECT PLAYERS
     # -----------------------------
-   rosters = get_team_rosters()
-
 rosters = get_team_rosters()
 
 all_hitters = []
@@ -50,24 +48,6 @@ for team, players in rosters.items():
         spot = (i % 9) + 1
 
         all_hitters.append((player, spot, team))
-
-    for i, player in enumerate(players[:12]):  # top 12 hitters per team
-
-        spot = (i % 9) + 1
-
-        all_hitters.append((player, spot, team))
-
-        for p in away_lineup:
-            name = p.get("name")
-            spot = p.get("battingOrder", 99)
-            if name:
-                all_hitters.append((name, spot, g["game"]))
-
-        for p in home_lineup:
-            name = p.get("name")
-            spot = p.get("battingOrder", 99)
-            if name:
-                all_hitters.append((name, spot, g["game"]))
 
     # -----------------------------
     # STEP 2: FALLBACK SAFETY
