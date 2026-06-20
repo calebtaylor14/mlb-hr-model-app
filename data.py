@@ -5,7 +5,12 @@ from mlb_data import (
     get_statcast_hitter_profile,
     get_statcast_pitcher_profile
 )
-from mlb_data import get_probable_pitchers
+
+from mlb_data import (
+    get_today_games_with_lineups,
+    get_statcast_hitter_profile,
+    get_statcast_pitcher_profile
+)
 
 
 import requests
