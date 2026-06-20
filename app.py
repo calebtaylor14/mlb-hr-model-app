@@ -1,20 +1,20 @@
 import streamlit as st
 import pandas as pd
 
-from data import get_today_games
+from data import build_slate
 from model import calculate_hr_score
 
-st.title("⚾ MLB HR Model Dashboard (LIVE)")
+st.title("⚾ MLB HR Model (LIVE + STATCAST + LINEUPS)")
 
-df = get_today_games()
+df = build_slate()
 
 df["HR_Score"] = df.apply(calculate_hr_score, axis=1)
 
 df = df.sort_values("HR_Score", ascending=False)
 
-st.subheader("🔥 Top HR Targets Today")
+st.subheader("🔥 Top HR Targets")
 
-st.dataframe(df[["game", "HR_Score"]])
+st.dataframe(df[["player", "game", "HR_Score"]])
 
 st.subheader("Full Slate")
 
