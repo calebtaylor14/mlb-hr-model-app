@@ -1,57 +1,83 @@
 import pandas as pd
-import requests
 from weather import get_weather_score
-def get_park_score(park_name="default"):
 
-    hr_parks = {
-        "Yankee Stadium": 4,
-        "Coors Field": 5,
-        "Fenway Park": 4,
-        "Dodger Stadium": 2,
-        "Petco Park": 1
+# -----------------------------
+# SAFE DATA LAYER (NO CRASHING)
+# -----------------------------
+
+def get_hitter_stats(player_name):
+    """
+    Placeholder-safe hitter stats.
+    Later we will replace with real Statcast pull.
+    """
+
+    # Default elite-ish baseline so model stays functional
+    return {
+        "barrel_pct": 8,
+        "hardhit_pct": 45,
+        "pull_air_pct": 22,
+        "iso": 0.200
     }
 
-    return hr_parks.get(park_name, 3)
+
+def get_pitcher_stats(pitcher_name):
+    """
+    Placeholder-safe pitcher stats.
+    Will be upgraded to real MLB/Statcast splits later.
+    """
+
+    return {
+        "hr9": 1.3,
+        "barrel_allowed": 9,
+        "flyball": 42,
+        "xslg": 0.430
+    }
+
+
+# -----------------------------
+# DAILY SLATE BUILDER
+# -----------------------------
 
 def get_today_games():
 
-    url = "https://statsapi.mlb.com/api/v1/schedule?sportId=1"
-    response = requests.get(url)
-    data = response.json()
+    weather_score = get_weather_score()
 
-    games = data["dates"][0]["games"]
+    hitter = get_hitter_stats("Aaron Judge")
+    pitcher = get_pitcher_stats("Opposing Pitcher")
 
-    rows = []
+    df = pd.DataFrame([
+        {
+            "player": "Aaron Judge",
+            "game": "Yankees @ Red Sox",
 
-    for g in games:
+            # ---------------- BATTER ----------------
+            "barrel_pct": hitter["barrel_pct"],
+            "hardhit_pct": hitter["hardhit_pct"],
+            "pull_air_pct": hitter["pull_air_pct"],
+            "iso": hitter["iso"],
 
-        away = g["teams"]["away"]["team"]["name"]
-        home = g["teams"]["home"]["team"]["name"]
+            # ---------------- PITCHER ----------------
+            "pitcher_hr9": pitcher["hr9"],
+            "pitcher_barrel_allowed": pitcher["barrel_allowed"],
+            "pitcher_flyball": pitcher["flyball"],
+            "pitcher_xslg": pitcher["xslg"],
 
-        rows.append({
-            "player": "TBD",
-            "game": f"{away} @ {home}",
-            "barrel_pct": 8,
-            "hardhit_pct": 45,
-            "pull_air_pct": 20,
-            "iso": 0.200,
+            # ---------------- MATCHUP ----------------
+            "pitch_type_edge": 4,
+            "handedness_edge": 5,
+            "swing_fit": 4,
 
-            "pitcher_hr9": 1.2,
-            "pitcher_barrel_allowed": 8,
-            "pitcher_flyball": 40,
-            "pitcher_xslg": 0.420,
+            # ---------------- SUPPRESSION ----------------
+            "pitcher_suppression": 10,
 
-            "pitch_type_edge": 3,
-            "handedness_edge": 3,
-            "swing_fit": 3,
+            # ---------------- ENVIRONMENT ----------------
+            "park_score": 4,
+            "weather_score": weather_score,
 
-            "pitcher_suppression": 8,
-
-            "park_score": get_park_score(),
-            "weather_score": get_weather_score(),
-
+            # ---------------- FORM ----------------
             "recent_form": 2,
             "bullpen_risk": 2
-        })
+        }
+    ])
 
-    return pd.DataFrame(rows)
+    return df
