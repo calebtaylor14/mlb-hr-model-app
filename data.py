@@ -34,6 +34,9 @@ def get_team_roster(team_id):
 
 
 def build_slate():
+    
+    from mlb_data import get_probable_pitchers
+    pitcher_map = get_probable_pitchers()
 
     rows = []
 
