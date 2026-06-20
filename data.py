@@ -14,19 +14,19 @@ def build_slate():
 
     weather_score = get_weather_score()
 
-    # expanded hitter pool so you ALWAYS get more than 2 players
+    # expanded fallback pool (ensures full slate coverage)
     fallback_pool = [
         "Aaron Judge",
         "Shohei Ohtani",
         "Juan Soto",
         "Matt Olson",
-        "Yordan Alvarez"
+        "Yordan Alvarez",
+        "Kyle Schwarber",
+        "Pete Alonso",
+        "Mookie Betts"
     ]
 
     for g in games:
-
-        away_team = g["away_team"]
-        home_team = g["home_team"]
 
         away_lineup = g.get("away_lineup", [])
         home_lineup = g.get("home_lineup", [])
@@ -49,10 +49,15 @@ def build_slate():
                 hitters.append((name, spot))
 
         # -------------------------
-        # FALLBACK IF EMPTY
+        # GUARANTEED COVERAGE FIX
         # -------------------------
-        if len(hitters) == 0:
-            hitters = [(name, i+1) for i, name in enumerate(fallback_pool)]
+        if len(hitters) < 6:
+            # fill missing players so slate is never small
+            for i, name in enumerate(fallback_pool):
+                hitters.append((name, i + 1))
+
+        # prevent duplicates
+        hitters = list(dict.fromkeys(hitters))
 
         for hitter, spot in hitters:
 
