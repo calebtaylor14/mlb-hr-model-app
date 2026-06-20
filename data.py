@@ -37,7 +37,7 @@ def get_today_games():
             "pitcher_suppression": 8,
 
             "park_score": 3,
-            "weather_score": 3,
+            "weather_score": get_weather_score(),
 
             "recent_form": 2,
             "bullpen_risk": 2
