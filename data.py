@@ -1,27 +1,45 @@
 import pandas as pd
+import requests
 
-def load_data():
+def get_today_games():
 
-    data = [
-        {
-            "player": "Aaron Judge",
+    url = "https://statsapi.mlb.com/api/v1/schedule?sportId=1"
+    response = requests.get(url)
+    data = response.json()
+
+    games = data["dates"][0]["games"]
+
+    rows = []
+
+    for g in games:
+
+        away = g["teams"]["away"]["team"]["name"]
+        home = g["teams"]["home"]["team"]["name"]
+
+        rows.append({
+            "player": "TBD",
+            "game": f"{away} @ {home}",
             "barrel_pct": 8,
-            "hardhit_pct": 52,
-            "pull_air_pct": 28,
-            "iso": 0.280,
-            "pitcher_hr9": 1.4,
-            "pitcher_barrel_allowed": 9,
-            "pitcher_flyball": 42,
-            "pitcher_xslg": 0.450,
-            "pitch_type_edge": 4,
-            "handedness_edge": 5,
-            "swing_fit": 4,
-            "pitcher_suppression": 10,
-            "park_score": 4,
+            "hardhit_pct": 45,
+            "pull_air_pct": 20,
+            "iso": 0.200,
+
+            "pitcher_hr9": 1.2,
+            "pitcher_barrel_allowed": 8,
+            "pitcher_flyball": 40,
+            "pitcher_xslg": 0.420,
+
+            "pitch_type_edge": 3,
+            "handedness_edge": 3,
+            "swing_fit": 3,
+
+            "pitcher_suppression": 8,
+
+            "park_score": 3,
             "weather_score": 3,
+
             "recent_form": 2,
             "bullpen_risk": 2
-        }
-    ]
+        })
 
-    return pd.DataFrame(data)
+    return pd.DataFrame(rows)
