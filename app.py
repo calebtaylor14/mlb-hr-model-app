@@ -13,6 +13,14 @@ st.title("⚾ MLB HR Model (LIVE)")
 # LOAD DATA SAFELY
 # -----------------------------
 df = build_slate()
+# HARD RESET DUPLICATE COLUMNS
+df = df.copy()
+
+# remove duplicate column names safely
+df = df.loc[:, ~df.columns.duplicated()]
+
+# optional debug
+st.write(df.columns.tolist())
 
 # safety guard (prevents crashes)
 if df is None or df.empty:
@@ -53,7 +61,9 @@ display_cols = [
 if "batting_order" in df.columns:
     display_cols.insert(2, "batting_order")
 df = df.loc[:, ~df.columns.duplicated()]
-st.dataframe(df[display_cols])
+safe_cols = [c for c in display_cols if c in df.columns]
+
+st.dataframe(df[safe_cols])
 
 # -----------------------------
 # FULL TABLE
