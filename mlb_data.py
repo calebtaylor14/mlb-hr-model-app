@@ -1,10 +1,6 @@
 import requests
 
 
-# -----------------------------
-# SINGLE SOURCE OF TRUTH
-# -----------------------------
-
 def get_today_games_with_lineups():
 
     url = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&hydrate=lineups"
@@ -19,7 +15,6 @@ def get_today_games_with_lineups():
             away = g["teams"]["away"]["team"]["name"]
             home = g["teams"]["home"]["team"]["name"]
 
-            # safe extraction (MLB API often incomplete)
             lineups = g.get("lineups", {}) if "lineups" in g else {}
 
             away_lineup = lineups.get("away", []) if isinstance(lineups, dict) else []
