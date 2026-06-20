@@ -7,79 +7,77 @@ from mlb_data import (
 )
 
 
+import requests
+
+def get_all_teams():
+
+    url = "https://statsapi.mlb.com/api/v1/teams?sportId=1"
+    res = requests.get(url)
+    data = res.json()
+
+    return [t["name"] for t in data.get("teams", [])]
+
+
+def get_team_roster(team_id):
+
+    url = f"https://statsapi.mlb.com/api/v1/teams/{team_id}/roster"
+    res = requests.get(url)
+    data = res.json()
+
+    players = []
+
+    for p in data.get("roster", []):
+        if p.get("position", {}).get("type") == "Hitter":
+            players.append(p["person"]["fullName"])
+
+    return players
+
+
 def build_slate():
 
-    games = get_today_games_with_lineups()
     rows = []
 
     weather_score = get_weather_score()
 
+    teams_url = "https://statsapi.mlb.com/api/v1/teams?sportId=1"
+    teams = requests.get(teams_url).json()["teams"]
+
     fallback_pool = [
-        "Aaron Judge",
-        "Shohei Ohtani",
-        "Juan Soto",
-        "Matt Olson",
-        "Yordan Alvarez",
-        "Kyle Schwarber",
-        "Pete Alonso",
-        "Mookie Betts",
-        "Freddie Freeman",
-        "Bryce Harper"
+        "Aaron Judge", "Shohei Ohtani", "Juan Soto",
+        "Matt Olson", "Yordan Alvarez", "Pete Alonso"
     ]
 
     all_hitters = []
 
     # -----------------------------
-    # STEP 1: COLLECT ALL PLAYERS FIRST
+    # BUILD FULL MLB PLAYER POOL
     # -----------------------------
-    for g in games:
+    for t in teams:
 
-        away_lineup = g.get("away_lineup", [])
-        home_lineup = g.get("home_lineup", [])
+        team_id = t["id"]
+        roster = get_team_roster(team_id)
 
-        for p in away_lineup:
-            name = p.get("name")
-            spot = p.get("battingOrder", 99)
-            if name:
-                all_hitters.append((name, spot, g["game"]))
+        for player in roster:
+            all_hitters.append(player)
 
-        for p in home_lineup:
-            name = p.get("name")
-            spot = p.get("battingOrder", 99)
-            if name:
-                all_hitters.append((name, spot, g["game"]))
+    # fallback safety
+    if len(all_hitters) < 50:
+        all_hitters += fallback_pool
+
+    # remove duplicates
+    all_hitters = list(set(all_hitters))
 
     # -----------------------------
-    # STEP 2: IF MLB FAILS, USE FALLBACK (GLOBAL)
+    # BUILD MODEL ROWS
     # -----------------------------
-    if len(all_hitters) < 10:
-        for i, name in enumerate(fallback_pool):
-            all_hitters.append((name, i + 1, "FALLBACK GAME"))
-
-    # remove duplicates safely
-    seen = set()
-    unique_hitters = []
-
-    for h in all_hitters:
-        key = (h[0], h[2])
-        if key not in seen:
-            seen.add(key)
-            unique_hitters.append(h)
-
-    # -----------------------------
-    # STEP 3: BUILD MODEL ROWS
-    # -----------------------------
-    for hitter, spot, game in unique_hitters:
+    for hitter in all_hitters:
 
         hitter_stats = get_statcast_hitter_profile(hitter)
         pitcher_stats = get_statcast_pitcher_profile("Opponent Pitcher")
 
-        order_multiplier = 1.15 if spot <= 4 else 1.0 if spot <= 6 else 0.9
-
         rows.append({
             "player": hitter,
-            "game": game,
-            "batting_order": spot,
+            "game": "ALL MLB SLATE",
 
             "barrel_pct": hitter_stats["barrel_pct"],
             "hardhit_pct": hitter_stats["hardhit_pct"],
@@ -100,9 +98,7 @@ def build_slate():
             "weather_score": weather_score,
 
             "recent_form": 2,
-            "bullpen_risk": 2,
-
-            "order_multiplier": order_multiplier
+            "bullpen_risk": 2
         })
 
     return pd.DataFrame(rows)
