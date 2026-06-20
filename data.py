@@ -1,6 +1,17 @@
 import pandas as pd
 import requests
 from weather import get_weather_score
+def get_park_score(park_name="default"):
+
+    hr_parks = {
+        "Yankee Stadium": 4,
+        "Coors Field": 5,
+        "Fenway Park": 4,
+        "Dodger Stadium": 2,
+        "Petco Park": 1
+    }
+
+    return hr_parks.get(park_name, 3)
 
 def get_today_games():
 
@@ -36,7 +47,7 @@ def get_today_games():
 
             "pitcher_suppression": 8,
 
-            "park_score": 3,
+            ""park_score": get_park_score(),
             "weather_score": get_weather_score(),
 
             "recent_form": 2,
