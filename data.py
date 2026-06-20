@@ -1,10 +1,6 @@
 import pandas as pd
 from weather import get_weather_score
-from mlb_data import (
-    get_today_games_and_lineups,
-    get_statcast_hitter_profile,
-    get_statcast_pitcher_profile
-)
+from mlb_data import get_today_games_with_lineups
 
 
 def build_slate():
