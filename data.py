@@ -1,17 +1,14 @@
 import pandas as pd
 from weather import get_weather_score
 
+
 # -----------------------------
-# SAFE DATA LAYER (NO CRASHING)
+# SAFE BASE STAT FUNCTIONS
+# (placeholders until Statcast upgrade)
 # -----------------------------
 
 def get_hitter_stats(player_name):
-    """
-    Placeholder-safe hitter stats.
-    Later we will replace with real Statcast pull.
-    """
 
-    # Default elite-ish baseline so model stays functional
     return {
         "barrel_pct": 8,
         "hardhit_pct": 45,
@@ -21,16 +18,13 @@ def get_hitter_stats(player_name):
 
 
 def get_pitcher_stats(pitcher_name):
-    """
-    Placeholder-safe pitcher stats.
-    Will be upgraded to real MLB/Statcast splits later.
-    """
 
     return {
         "hr9": 1.3,
         "barrel_allowed": 9,
         "flyball": 42,
-        "xslg": 0.430
+        "xslg": 0.430,
+        "suppression": 9
     }
 
 
@@ -40,10 +34,11 @@ def get_pitcher_stats(pitcher_name):
 
 def get_today_games():
 
-    weather_score = get_weather_score()
-
     hitter = get_hitter_stats("Aaron Judge")
     pitcher = get_pitcher_stats("Opposing Pitcher")
+
+    # weather is intentionally global for MVP
+    weather_score = get_weather_score()
 
     df = pd.DataFrame([
         {
@@ -68,7 +63,7 @@ def get_today_games():
             "swing_fit": 4,
 
             # ---------------- SUPPRESSION ----------------
-            "pitcher_suppression": 10,
+            "pitcher_suppression": pitcher["suppression"],
 
             # ---------------- ENVIRONMENT ----------------
             "park_score": 4,
