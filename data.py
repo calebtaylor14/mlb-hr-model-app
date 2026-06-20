@@ -1,5 +1,7 @@
 import pandas as pd
 
+from mlb_data import get_team_rosters
+
 from mlb_data import (
     get_today_games_with_lineups,
     get_statcast_hitter_profile,
