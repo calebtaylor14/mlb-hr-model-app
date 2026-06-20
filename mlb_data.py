@@ -1,5 +1,29 @@
 import requests
 
+def get_team_rosters():
+
+    url = "https://statsapi.mlb.com/api/v1/teams?sportId=1"
+    teams = requests.get(url).json()["teams"]
+
+    roster_map = {}
+
+    for t in teams:
+        team_id = t["id"]
+        team_name = t["name"]
+
+        r = requests.get(f"https://statsapi.mlb.com/api/v1/teams/{team_id}/roster").json()
+
+        hitters = []
+
+        for p in r.get("roster", []):
+            person = p.get("person", {}).get("fullName")
+            if person:
+                hitters.append(person)
+
+        roster_map[team_name] = hitters
+
+    return roster_map
+
 
 # -----------------------------
 # GAMES + LINEUPS
