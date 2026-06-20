@@ -1,5 +1,6 @@
 import pandas as pd
 import requests
+from weather import get_weather_score
 
 def get_today_games():
 
