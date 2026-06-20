@@ -52,7 +52,7 @@ display_cols = [
 
 if "batting_order" in df.columns:
     display_cols.insert(2, "batting_order")
-
+df = df.loc[:, ~df.columns.duplicated()]
 st.dataframe(df[display_cols])
 
 # -----------------------------
