@@ -47,7 +47,7 @@ def get_today_games():
 
             "pitcher_suppression": 8,
 
-            ""park_score": get_park_score(),
+            "park_score": get_park_score(),
             "weather_score": get_weather_score(),
 
             "recent_form": 2,
